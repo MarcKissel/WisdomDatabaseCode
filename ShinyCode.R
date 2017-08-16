@@ -1,5 +1,19 @@
 #server.r file
 
+############################################
+###code for https://marckissel.shinyapps.io/wisdom_database/
+############################################
+#note: this is a juryrigged version based on other examples
+#specfically the shiny tutorial and other online help
+#any issues/concerns/fixes/etc. please send my way
+#marc.kissel@gmail.com
+#hoping to update this as we go, add more to the database, and make
+#the site better
+#
+#thanks!
+
+
+
 #loaded needed packages
 library(shiny)
 library(tidyr)
