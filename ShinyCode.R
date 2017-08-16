@@ -9,20 +9,22 @@ library(dplyr)
 #then, set up data
 pal3 <- colorFactor(topo.colors(10),
                     domain  = c("45-99", "100-199", "200-299", "300-399", "400-499", "500-599", "600+", "NoDate")
-)
-new_data <- read_csv("DataDownload.csv")
-new_df <- new_data %>% unite(Artifact_present,Artifact_Class, Present, sep="_" ) 
-new_df_selected <- new_df %>% select(Site_name:citation)
+) # set colors
+new_data <- read_csv("DataDownload.csv") #readin data from database 
+new_df <- new_data %>% unite(Artifact_present,Artifact_Class, Present, sep="_" )  #get rid of things I don't need
+new_df_selected <- new_df %>% select(Site_name:citation) 
 df_2 <- new_df_selected
 df_2$group <- factor(df_2$Group, levels = c( "45-99", "100-199", "200-299", "300-399", "400-499", "500-599", "600+", "NoDate"))
 temp_date <- df_2 %>% spread(key = Artifact_present, value =citation) #put table into right format for dates
 temp_date2 <- temp_date %>% select(Site_name:Hominin) # select only needed tables to display
 full_table <- temp_date %>% select(Site_name:Group, ends_with("yes") ) #table for full search
 
+#setup the server
+#put map on main page
 server <- function(input, output) {
-  filtered_data <- reactive({df_2[df_2$Artifact_present == input$specy, ] })
+  filtered_data <- reactive({df_2[df_2$Artifact_present == input$ArtifactTypes, ] })
   output$content <- renderDataTable({
-    df_2[df_2$Artifact_present == input$specy, ] #table for artifact types
+    df_2[df_2$Artifact_present == input$ArtifactTypes, ] #table for artifact types
   }, options = list(orderClasses = TRUE, lengthMenu = c(5,10,50), pageLength = 10 ))
   output$date_table <- renderDataTable({ 
     temp_date2[temp_date2$Group == input$date_choose, ] #here, changing to temp_date
@@ -37,7 +39,7 @@ server <- function(input, output) {
     
     
   })
-  #below for date
+  #below for date information
   filtered_data_dates <- reactive({df_2[df_2$group == input$date_choose, ] }) #changed name of df_2 to temp_date
   output$date_map <- renderLeaflet({
     leaflet(df_2) %>% addTiles() %>% addLegend("topright", pal=pal3, values =~group, title = "ages in ka")
@@ -110,7 +112,7 @@ ui <- dashboardPage(
                   title = "Aritfact type", status = "primary", solidHeader = TRUE,
                   "Select an artifact type", br(),
                   "See 'overview' for details on artifact types",
-                  selectInput("specy", "Artifact Type",choices = c("art" = "art_yes", "bone" = "bone_yes", "engraved ochre" = "engravedOchre_yes", "engraved bone" = "engravedBone_yes",  "engraved eggshell" = "engravedEggshell_yes", "engraved stone" = "engravedStone_yes",  "engraved ochre" = "engravedOchre_yes", "hafting" = "hafting_yes", "exotic" = "exotic_yes", "ornamentation" = "ornamentation_yes","ochre" = "ochre_yes", "engraved" = "engraved_yes", "wooden" = "wooden_yes"), selected = NULL)
+                  selectInput("ArtifactTypes", "Artifact Type",choices = c("art" = "art_yes", "bone" = "bone_yes", "engraved ochre" = "engravedOchre_yes", "engraved bone" = "engravedBone_yes",  "engraved eggshell" = "engravedEggshell_yes", "engraved stone" = "engravedStone_yes",  "engraved ochre" = "engravedOchre_yes", "hafting" = "hafting_yes", "exotic" = "exotic_yes", "ornamentation" = "ornamentation_yes","ochre" = "ochre_yes", "engraved" = "engraved_yes", "wooden" = "wooden_yes"), selected = NULL)
                 )
                 ,
                 
